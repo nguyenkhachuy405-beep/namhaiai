@@ -198,6 +198,7 @@ main{max-width:1680px;margin:0 auto;padding:12px 10px 40px;display:grid;gap:14px
 .kn span{font-size:11.5px;padding:4px 9px;border-radius:9px;border:1px solid var(--vien);background:rgba(255,255,255,.03)}
 .kn span i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:1px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip.cong-cu{text-decoration:none;color:#fff;background:linear-gradient(135deg,rgba(5,101,192,.55),rgba(230,0,126,.35));border-color:transparent;font-weight:600}
 .chips .chip{white-space:normal;text-align:left;max-width:100%;border-radius:14px}
 .nut-chinh{width:100%;border:0;border-radius:13px;padding:11px;font-weight:700;color:#fff;background:linear-gradient(90deg,var(--xanh),#2b8cff 60%,var(--hong));margin-top:4px}
 .nut-chinh:disabled{opacity:.5}
@@ -502,6 +503,7 @@ const KHU = [
   { id:'p1',  so:'1', ten:'Điều hành vận tải', ngan:'Điều hành', icon:'🚌', mau:'#20d39a', o:[1,0],
     viec:['Theo dõi lịch chạy xe','Quản lý xe, tài xế và phân công','Phát hiện trùng lịch, xe thiếu tài xế, xe đến hạn bảo dưỡng','Đề xuất điều chỉnh lịch trình (cần duyệt)'],
     kenh:[['Lịch xe – Google Sheet','hoat_dong'],['Kiểm tra trùng lịch','thu_nghiem'],['Đổi lịch xe','can_duyet']],
+    congCu:[['Giấy tờ xe & Tài xế','https://script.google.com/macros/s/AKfycbziBMR5-rgIbZz6BsdP82CM_5AtWb81vGC234oq2xyLuBKRuu24gVmeQOe71v5k4cx4Aw/exec']],
     goiY:['Lịch xe hôm nay có những chuyến nào?','Kiểm tra lịch xe ngày mai có trùng xe hoặc thiếu tài xế không']},
   { id:'p3',  so:'3', ten:'OTA & Booking', ngan:'OTA', icon:'🎫', mau:'#2f8cff', o:[2,0],
     viec:['Theo dõi 12GO, Klook, Trip.com, Bookaway','Tra cứu booking từ Gmail hoặc API được cấp quyền','Phân loại booking mới, thay đổi, huỷ, hoàn vé','Chuẩn bị email xác nhận / báo đổi điểm đón (cần duyệt)'],
@@ -516,7 +518,8 @@ const KHU = [
     kenh:[['Duyệt trên web này','hoat_dong']], goiY:[] },
   { id:'p7',  so:'7', ten:'Kỹ thuật & Bảo dưỡng', ngan:'Kỹ thuật', icon:'🔧', mau:'#5ec8ff', o:[0,1],
     viec:['Theo dõi thay nhớt: 10.000 km nhắc, 12.000 km phải thay','Nhắc đăng kiểm, bảo hiểm, giấy tờ xe','Báo phòng Điều hành xe sắp đến hạn bảo dưỡng'],
-    kenh:[['Công cụ thay nhớt','chua_ket_noi'],['Giấy tờ xe','chua_ket_noi']],
+    kenh:[['Thay nhớt – AI đọc được','hoat_dong'],['Giấy tờ xe & bằng lái – AI đọc được','hoat_dong']],
+    congCu:[['Thay nhớt','https://script.google.com/macros/s/AKfycbypCkOHnKDABPVhT7fxRbjZbcr7NHwUjFd5XO9vbLiDiyez_VxEE7vt59GE9qgvD49Z/exec'],['Giấy tờ xe & Tài xế','https://script.google.com/macros/s/AKfycbziBMR5-rgIbZz6BsdP82CM_5AtWb81vGC234oq2xyLuBKRuu24gVmeQOe71v5k4cx4Aw/exec']],
     goiY:['Xe nào sắp đến hạn thay nhớt?']},
   { id:'p8',  so:'8', ten:'Giám sát hành trình', ngan:'Giám sát', icon:'🛰️', mau:'#ff8a3d', o:[4,1],
     viec:['Theo dõi đúng giờ: SG – Mũi Né trong 4 tiếng 15','Phát hiện chạy quá tốc độ, dừng đỗ bất thường','Báo cáo hành trình từng xe cho quản lý'],
@@ -530,11 +533,12 @@ const KHU = [
     goiY:['Soạn bài Facebook giới thiệu điểm đón mới 355 Phạm Ngũ Lão','Lên ý tưởng 3 video TikTok tuyến SG – Mũi Né']},
   { id:'p5',  so:'5', ten:'Kế toán & Doanh thu', ngan:'Kế toán', icon:'💰', mau:'#ffb547', o:[2,2],
     viec:['Tổng hợp doanh thu từng tuyến','Đối soát booking, công nợ OTA và đại lý','Kiểm tra chi phí vận hành, lãi lỗ từng xe','Hỗ trợ bảng lương, chấm công, ứng lương và báo cáo quỹ'],
-    kenh:[['Bảng dữ liệu NguonDuLieu','thu_nghiem'],['Lãi lỗ từng xe','chua_ket_noi'],['Thu chi văn phòng','chua_ket_noi'],['Chấm công & lương','chua_ket_noi']],
+    kenh:[['Doanh thu & chi phí xe','hoat_dong'],['Sổ quỹ văn phòng','hoat_dong'],['Công nợ đại lý, tài xế thu, dầu','hoat_dong'],['Hàng hóa','hoat_dong'],['Chấm công & lương','chua_ket_noi']],
+    congCu:[['Lãi lỗ từng xe','https://script.google.com/macros/s/AKfycbxKFCR6Eq_bncfPvskN0ijB-7ePcZjWoLdBGTTcqFhyF4n0dmgHqDvIvEzKC872ncQ6ew/exec'],['Công nợ đại lý','https://script.google.com/macros/s/AKfycbyG9n7UvsJcGCcaBii2LgOhuElXGCPC29adWUDngcTR15ekQpA-3LqvACJWvDWYfOP8/exec'],['Công nợ vé dọc đường','https://script.google.com/macros/s/AKfycbxmc8LoTWH3MqNiZGGN9VvBsAJ1j4yJsf38zAfRnrZKEisFTcm_TvXZSmawGr25sT-4/exec'],['Doanh số hàng hóa','https://script.google.com/macros/s/AKfycbx4P3mhA8o8NjOjMfh6erH_ppCd_Nmdw82Y3rno3KDkqijNWdLebIYM5fqiE8mw_8LSfg/exec'],['Công nợ dầu Hải Thắng','https://script.google.com/macros/s/AKfycbxGBFT2s5HWDXYOjTpja44cMUJP1zsqakFz7FZJ76qPzJJ_N41qdnMH5dmzQmPfB7om/exec']],
     goiY:['Có những bảng dữ liệu nào?','Đổi giá vé SG – Mũi Né lên 280k từ 1/12']},
   { id:'p6',  so:'6', ten:'Nhân sự', ngan:'Nhân sự', icon:'🧑‍💼', mau:'#7be0d0', o:[3,2],
     viec:['Quản lý hồ sơ nhân viên','Theo dõi tuyển dụng','Quản lý tài xế: lịch, cân tour, KPI đúng giờ & đánh giá 5 sao'],
-    kenh:[['Hồ sơ nhân viên','chua_ket_noi'],['Cân tour tài xế','chua_ket_noi'],['KPI 5 sao','chua_ket_noi']],
+    kenh:[['KPI đánh giá 5 sao – AI đọc được','hoat_dong'],['Hồ sơ nhân viên','chua_ket_noi'],['Cân tour tài xế','chua_ket_noi']],
     goiY:['Giao cho Hà lên tin tuyển 2 tài xế tuyến SG – Nha Trang, hạn thứ 6']},
   { id:'nghi',so:'', ten:'Khu thư giãn & bóng bàn', ngan:'Thư giãn', icon:'🏓', mau:'#9be15d', o:[4,2], loai:'nghi',
     viec:['Sofa, ghế lười, máy game, bàn bóng bàn – nhân viên AI ghé nghỉ giữa các việc','Chỉ là hoạt ảnh sinh hoạt, không ảnh hưởng dữ liệu'], kenh:[], goiY:[] },
@@ -1810,6 +1814,7 @@ function vePhong() {
     <h4>Nhiệm vụ</h4><ul class="nv-list">${k.viec.map(v => `<li>${esc(v)}</li>`).join('')}</ul>
     <h4>Đang xử lý</h4>${dang || '<div class="chua-co">Không có việc đang xử lý.</div>'}
     ${ds.length ? `<h4>Nhân sự</h4><div class="ns" id="dsNS">${nsHTML}</div>` : ''}
+    ${(k.congCu || []).length ? `<h4>Công cụ</h4><div class="chips">${k.congCu.map(([t, u]) => `<a class="chip cong-cu" href="${esc(u)}" target="_blank" rel="noopener">🔗 ${esc(t)}</a>`).join('')}</div>` : ''}
     ${k.kenh.length ? `<h4>Kết nối</h4><div class="kn">${k.kenh.map(([t, s]) => `<span><i style="background:${TT_KENH[s][0]}"></i>${esc(t)} · ${TT_KENH[s][1]}</span>`).join('')}</div>` : ''}
     ${k.goiY.length ? `<h4>Giao việc nhanh</h4><div class="chips">${k.goiY.map(g => `<button class="chip" data-g="${esc(g)}">${esc(g)}</button>`).join('')}</div>` : ''}
     ${k.id === 'hop' ? `<button class="nut-chinh" id="nutHop" ${DoiSong.dangHop ? 'disabled' : ''}>🗓 Bắt đầu họp giao ban</button>` : ''}
