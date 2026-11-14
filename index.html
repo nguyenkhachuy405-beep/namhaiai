@@ -1862,7 +1862,7 @@ setInterval(() => {
 }, 1000);
 
 /* ===================== TIN KHÁCH CHƯA TRẢ LỜI ===================== */
-const TIN_CHO_MAU = { n1:30, n2:60, quetCuoi:new Date(Date.now() - 12e4).toISOString(), ds:[
+const TIN_CHO_MAU = { n1:30, n2:60, ketNoi:{ fb:true, zalo:true, nhom:false }, quetCuoi:new Date(Date.now() - 12e4).toISOString(), ds:[
   { kenh:'Facebook', ten:'Emily Carter (MẪU)', tin:'Hi, where do I get on the bus to Mui Ne tomorrow? My ticket says 229 Pham Ngu Lao.', phut:72, daNhac:2, link:'https://business.facebook.com/latest/inbox/all' },
   { kenh:'Zalo OA', ten:'Chị Thảo (MẪU)', tin:'Cho chị hỏi mua 5 vé có giảm không em?', phut:41, daNhac:1, link:'https://oa.zalo.me/manage/' },
   { kenh:'Zalo OA', ten:'Anh Minh (MẪU)', tin:'Xe Nha Trang tối nay còn ghế không?', phut:33, daNhac:1, link:'https://oa.zalo.me/manage/' }
@@ -1884,6 +1884,7 @@ async function taiTinCho() {
   try { tinCho = LA_APPS_SCRIPT ? await goiServer('ai_tinChuaTraLoi', token) : TIN_CHO_MAU; }
   catch (e) { tinCho = null; $('dsTin').innerHTML = '<div class="chua-co">Chưa bật theo dõi tin (thiếu file TheoDoiTin.gs hoặc chưa cho phép hàm ai_tinChuaTraLoi).</div>'; return; }
   veTinCho();
+  if (phongDangXem === 'p2') vePhong();   // cập nhật trạng thái kết nối của phòng CSKH
 }
 function veTinCho() {
   const tc = tinCho || { ds: [] }, n2 = tc.n2 || 60;
