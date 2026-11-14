@@ -26,6 +26,7 @@ import http.server, http.client, socketserver, os
 UP = {'/openapi/': 'openapi.zalo.me', '/oauth/': 'oauth.zaloapp.com'}
 BO = {'host', 'connection', 'content-length', 'accept-encoding', 'x-forwarded-for', 'x-forwarded-host',
       'x-forwarded-proto', 'via', 'transfer-encoding', 'x-namhai-key', 'keep-alive'}
+GIU = {'access_token', 'secret_key', 'content-type'}
 TEST = os.environ.get('NH_TEST')  # chi dung khi kiem thu
 
 class H(http.server.BaseHTTPRequestHandler):
@@ -48,8 +49,11 @@ class H(http.server.BaseHTTPRequestHandler):
             c = http.client.HTTPConnection('127.0.0.1', int(TEST), timeout=30) if TEST else http.client.HTTPSConnection(UP[goc], timeout=30)
             c.putrequest(self.command, '/' + self.path[len(goc):], skip_host=True, skip_accept_encoding=True)
             c.putheader('host', UP[goc])
+            # Chi chuyen dung cac khoa Zalo can, bo het header cua Google (tranh Zalo tra trang loi)
             for k, v in self.headers.items():
-                if k.lower() not in BO: c.putheader(k.lower(), v)
+                if k.lower() in GIU: c.putheader(k.lower(), v)
+            c.putheader('user-agent', 'NamHaiAI/1.0')
+            c.putheader('accept', 'application/json')
             if body is not None: c.putheader('content-length', str(len(body)))
             c.endheaders(body)
             r = c.getresponse(); data = r.read()
@@ -102,6 +106,7 @@ echo " Quoc gia cua may chu: $QG  (phai la VN)"
 echo " LINK     : https://$TEN"
 echo " MAT KHAU : $KEY"
 echo " Bo chuyen tiep: $(systemctl is-active namhai-zalo.service)  (phai la active)"
+echo " Phien ban: 4"
 echo "=================================================="
 echo "Kiem tra nhanh (phai hien chu: cam):"
 curl -s --max-time 30 "https://$TEN/openapi/" || echo "(chua co chung chi HTTPS, doi 1-2 phut roi thu lai)"
