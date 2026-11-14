@@ -34,6 +34,12 @@ class H(http.server.BaseHTTPRequestHandler):
         self.send_response(code); self.send_header('Content-Type', ct)
         self.send_header('Content-Length', str(len(data))); self.end_headers(); self.wfile.write(data)
     def _di(self):
+        if self.path.startswith('/echo'):  # chan doan: xem header nao toi duoc may chu (che gia tri)
+            import json
+            n = int(self.headers.get('Content-Length') or 0)
+            if n: self.rfile.read(n)
+            hd = {k: (v[:4] + '...(' + str(len(v)) + ')') for k, v in self.headers.items()}
+            return self._tra(200, json.dumps({'path': self.path, 'headers': hd, 'body': n}).encode(), 'application/json')
         goc = next((p for p in UP if self.path.startswith(p)), None)
         if not goc: return self._tra(404, b'khong co')
         n = int(self.headers.get('Content-Length') or 0)
