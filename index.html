@@ -239,6 +239,10 @@ main{max-width:1680px;margin:0 auto;padding:12px 10px 40px;display:grid;gap:14px
 .tin-cho a{color:#8cc6ff;font-weight:600;text-decoration:none;white-space:nowrap}
 .so-nhanh .do b{color:#ff6b7d}
 h3 .quet{margin-left:auto;font-size:10.5px;letter-spacing:0;text-transform:none;color:var(--mo);font-weight:500}
+.nut-gon{border:1px solid var(--vien);background:rgba(255,255,255,.04);color:var(--phu);border-radius:9px;padding:3px 9px;font-family:inherit;font-weight:600;font-size:11px;letter-spacing:0;text-transform:none;cursor:pointer;white-space:nowrap}
+.nut-gon:hover{color:#fff;border-color:#5b7bb0}
+.xem-them{display:block;width:100%;margin-top:2px;padding:8px;border:1px dashed var(--vien);border-radius:10px;background:transparent;color:#9cc4ff;font-family:inherit;font-weight:600;font-size:12.5px;cursor:pointer}
+#dsTin.an-het{display:none}
 .kenh.fb{background:#1877f2;color:#fff}.kenh.wa{background:#25d366;color:#05301a}.kenh.zalo{background:#0068ff;color:#fff}
 .tin-khach{background:rgba(255,255,255,.06);border-radius:10px;padding:8px 10px;font-size:13px;line-height:1.45;display:flex;flex-direction:column;gap:3px}
 .duyet .chi-ql{font-size:12px;color:var(--phu);margin-top:8px}
@@ -349,7 +353,7 @@ h3 .quet{margin-left:auto;font-size:10.5px;letter-spacing:0;text-transform:none;
 
   <section class="cot">
     <div class="khoi kinh"><h3>🔔 Thông báo & việc cần xử lý <span class="dem an" id="demXL"></span></h3><div id="dsThongBao"></div></div>
-    <div class="khoi kinh"><h3>💬 Tin khách chưa trả lời <span class="dem an" id="demTin"></span><span class="quet" id="tinQuet"></span></h3><div id="dsTin"><div class="chua-co">Đang tải…</div></div></div>
+    <div class="khoi kinh"><h3>💬 Tin khách chưa trả lời <span class="dem an" id="demTin"></span><span class="quet" id="tinQuet"></span><button class="nut-gon" id="nutGonTin" type="button">▴ Thu gọn</button></h3><div id="dsTin"><div class="chua-co">Đang tải…</div></div></div>
     <div class="phong-ct kinh" id="bangPhong"></div>
     <div class="khoi kinh"><h3>📅 Hôm nay</h3><div class="hom-nay" id="homNay"></div></div>
     <div class="khoi kinh"><h3>⚡ Hiệu suất AI hôm nay</h3><div id="hieuSuat"></div></div>
@@ -1867,7 +1871,12 @@ const TIN_CHO_MAU = { n1:30, n2:60, ketNoi:{ fb:true, zalo:true, nhom:false }, q
   { kenh:'Zalo OA', ten:'Chị Thảo (MẪU)', tin:'Cho chị hỏi mua 5 vé có giảm không em?', phut:41, daNhac:1, link:'https://oa.zalo.me/manage/' },
   { kenh:'Zalo OA', ten:'Anh Minh (MẪU)', tin:'Xe Nha Trang tối nay còn ghế không?', phut:33, daNhac:1, link:'https://oa.zalo.me/manage/' }
 ] };
-let tinCho = null, tinChoDaTai = false;
+let tinCho = null, tinChoDaTai = false, tinXemHet = false, tinAnHet = false;
+try { tinAnHet = localStorage.getItem('nh_tin_gon') === '1'; } catch (e) {}
+document.addEventListener('click', e => {
+  if (e.target.closest('#nutGonTin')) { tinAnHet = !tinAnHet; try { localStorage.setItem('nh_tin_gon', tinAnHet ? '1' : '0'); } catch (x) {} veTinCho(); }
+  else if (e.target.closest('#nutXemTin')) { tinXemHet = !tinXemHet; veTinCho(); }
+});
 // Trạng thái kết nối thật của phòng CSKH, lấy từ hệ thống theo dõi tin (TheoDoiTin.gs)
 function kenhThat(k) {
   const kn = tinCho && tinCho.ketNoi;
@@ -1892,7 +1901,11 @@ function veTinCho() {
   $('demTin').textContent = tc.ds.length; $('demTin').classList.toggle('an', !tc.ds.length);
   $('soTinCho') && ($('soTinCho').textContent = tc.ds.length);
   $('tinQuet').textContent = tc.quetCuoi ? 'quét lúc ' + gio(tc.quetCuoi) : '';
-  $('dsTin').innerHTML = tc.ds.length ? tc.ds.map(x => `<div class="tin-cho ${x.phut >= n2 ? 'khan' : ''}"><div class="dong1"><span class="kenh ${x.kenh === 'Facebook' ? 'fb' : 'zalo'}">${esc(x.kenh)}</span><b>${esc(x.ten || 'Khách')}</b><span class="cho">${thoiLuong(x.phut)}</span></div><div class="noi">“${esc(x.tin)}”</div><div class="dong3"><span>${x.daNhac ? 'Đã nhắc nhóm ' + x.daNhac + ' lần' : 'Chưa nhắc (ngoài giờ)'}</span>${/^https?:\/\//.test(x.link || '') ? `<a href="${esc(x.link)}" target="_blank" rel="noopener">Mở hộp thư ↗</a>` : ''}</div></div>`).join('') : `<div class="chua-co">Không có tin nào chờ quá ${tc.n1 || 30} phút. 👍</div>`;
+  const HIEN = 5, ds = tinXemHet ? tc.ds : tc.ds.slice(0, HIEN);
+  $('dsTin').classList.toggle('an-het', tinAnHet);
+  $('nutGonTin').textContent = tinAnHet ? '▾ Mở (' + tc.ds.length + ')' : '▴ Thu gọn';
+  $('dsTin').innerHTML = tc.ds.length ? ds.map(x => `<div class="tin-cho ${x.phut >= n2 ? 'khan' : ''}"><div class="dong1"><span class="kenh ${x.kenh === 'Facebook' ? 'fb' : 'zalo'}">${esc(x.kenh)}</span><b>${esc(x.ten || 'Khách')}</b><span class="cho">${thoiLuong(x.phut)}</span></div><div class="noi">“${esc(x.tin)}”</div><div class="dong3"><span>${x.daNhac ? 'Đã nhắc nhóm ' + x.daNhac + ' lần' : 'Chưa nhắc (ngoài giờ)'}</span>${/^https?:\/\//.test(x.link || '') ? `<a href="${esc(x.link)}" target="_blank" rel="noopener">Mở hộp thư ↗</a>` : ''}</div></div>`).join('') +
+    (tc.ds.length > HIEN ? `<button class="xem-them" id="nutXemTin" type="button">${tinXemHet ? '▴ Chỉ xem ' + HIEN + ' tin lâu nhất' : '▾ Xem tất cả ' + tc.ds.length + ' tin'}</button>` : '') : `<div class="chua-co">Không có tin nào chờ quá ${tc.n1 || 30} phút. 👍</div>`;
 }
 
 /* ===================== TỔNG QUAN ===================== */
@@ -1981,6 +1994,21 @@ function veBuoc(b) {
 }
 
 let khuDangLam = 'gd';
+// Hỏi về tin nhắn chưa trả lời → trả lời ngay từ dữ liệu theo dõi tin, không cần gọi AI (nhanh, không bị quá tải)
+function traLoiTinCho(cau) {
+  const t = String(cau).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd');
+  if (!/(tin nhan|inbox|tin khach|nhan tin)/.test(t) || !/(chua|tra loi|phan hoi|ton|cho)/.test(t) || !tinCho) return null;
+  const ds = tinCho.ds || [], n2 = tinCho.n2 || 60;
+  if (!ds.length) return { traLoi: `Hiện **không có tin nào** chờ quá ${tinCho.n1 || 30} phút. 👍`, trangThai: 'hoan_thanh', buoc: [] };
+  const theo = {}; ds.forEach(x => theo[x.kenh] = (theo[x.kenh] || 0) + 1);
+  const tl = p => p >= 60 ? Math.floor(p / 60) + ' giờ ' + (p % 60) + ' phút' : p + ' phút';
+  const khan = ds.filter(x => x.phut >= n2).length;
+  const dong = ds.slice(0, 5).map((x, i) => `${i + 1}. **${x.ten || 'Khách'}** (${x.kenh}) – chờ ${tl(x.phut)}: “${x.tin}”`).join('\n');
+  return { trangThai: 'hoan_thanh', buoc: [], traLoi:
+    `Có **${ds.length} tin khách chưa trả lời**` + (khan ? `, trong đó **${khan} tin quá ${n2} phút** cần ưu tiên` : '') + `.\n\n` +
+    Object.keys(theo).map(k => `- ${k}: ${theo[k]} tin`).join('\n') + `\n\n**Chờ lâu nhất:**\n${dong}` +
+    (ds.length > 5 ? `\n\nXem đủ ${ds.length} tin ở khung 💬 Tin khách chưa trả lời.` : '') };
+}
 async function guiLenh(cau) {
   cau = (cau || '').trim(); if (!cau || dangChay) return;
   dangChay = true; $('nutGui').disabled = true; $('o').value = ''; coGian();
@@ -1991,7 +2019,7 @@ async function guiLenh(cau) {
   if (VP.coSan) LenhVP.batDau(cau);
   const hen = setTimeout(() => { if (dangChay) datTrangThai('dang_xu_ly'); }, 1600);
   try {
-    const kq = LA_APPS_SCRIPT ? await goiServer('ai_lenh', token, lichSu, cau) : await XemThu.ai_lenh(token, lichSu, cau, b => veBuoc(b));
+    const kq = traLoiTinCho(cau) || (LA_APPS_SCRIPT ? await goiServer('ai_lenh', token, lichSu, cau) : await XemThu.ai_lenh(token, lichSu, cau, b => veBuoc(b)));
     clearTimeout(hen); $('dangNghi')?.remove();
     if (LA_APPS_SCRIPT) (kq.buoc || []).forEach(veBuoc);
     $('traLoi').innerHTML = md(kq.traLoi);
