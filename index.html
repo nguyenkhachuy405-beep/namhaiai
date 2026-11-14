@@ -1854,7 +1854,7 @@ function vePhong() {
     ${k.id === 'hop' ? `<button class="nut-chinh" id="nutHop" ${DoiSong.dangHop ? 'disabled' : ''}>🗓 Bắt đầu họp giao ban</button>` : ''}
     ${k.id === 'ql' ? `<button class="nut-chinh" id="nutXemDuyet">Xem ${soChoDuyet} việc chờ duyệt</button>` : ''}`;
   $('nutDongPhong').onclick = () => { chonPhong(null); VP.coSan && VP.toanCanh(); };
-  el.querySelectorAll('.chip').forEach(b => b.onclick = () => { $('o').value = b.dataset.g; coGian(); datTrangThai('dang_nghe'); $('o').focus(); $('o').scrollIntoView({ behavior:'smooth', block:'center' }); });
+  el.querySelectorAll('.chip[data-g]').forEach(b => b.onclick = () => { $('o').value = b.dataset.g; coGian(); datTrangThai('dang_nghe'); $('o').focus(); $('o').scrollIntoView({ behavior:'smooth', block:'center' }); });
   el.querySelectorAll('[data-nv]').forEach(d => d.onclick = () => { const n = VP.nv[d.dataset.nv]; if (n) VP.noiBong(n, esc(n.a.vt), 3, 'xanh'); });
   $('nutHop') && ($('nutHop').onclick = async () => { if (!(await DoiSong.hop())) toast('Đang bận, chưa đủ người để họp. Thử lại sau ít phút.'); });
   $('nutXemDuyet') && ($('nutXemDuyet').onclick = () => $('dsDuyet').scrollIntoView({ behavior:'smooth', block:'center' }));
