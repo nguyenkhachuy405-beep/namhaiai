@@ -225,6 +225,22 @@ main{max-width:1680px;margin:0 auto;padding:12px 10px 40px;display:grid;gap:14px
 .duyet .nut button{flex:1;border:0;border-radius:11px;padding:10px;font-weight:700}
 .n-duyet{background:linear-gradient(90deg,var(--hong),#ff4fa3);color:#fff}
 .n-tu-choi{background:rgba(255,255,255,.08);color:#cfe1ff}
+.duyet textarea{width:100%;padding:9px 10px;border-radius:10px;border:1px solid var(--vien);background:rgba(0,0,0,.3);outline:none;resize:vertical;line-height:1.45}
+.kenh-chat{font-size:12.5px;color:#cfe1ff;margin-bottom:6px}
+.kenh{font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:7px;margin-right:4px}
+.tin-cho{border:1px solid var(--vien);border-left:3px solid var(--canh);border-radius:12px;padding:9px 11px;margin-bottom:8px;background:rgba(255,181,71,.06)}
+.tin-cho.khan{border-left-color:var(--loi);background:rgba(255,90,110,.08)}
+.tin-cho .dong1{display:flex;align-items:center;gap:7px;font-size:13px;min-width:0}
+.tin-cho .dong1 b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tin-cho .cho{margin-left:auto;font-weight:800;color:var(--canh);white-space:nowrap}
+.tin-cho.khan .cho{color:var(--loi)}
+.tin-cho .noi{font-size:12.5px;color:#cfe1ff;margin:5px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tin-cho .dong3{display:flex;justify-content:space-between;gap:8px;font-size:11.5px;color:var(--phu)}
+.tin-cho a{color:#8cc6ff;font-weight:600;text-decoration:none;white-space:nowrap}
+.so-nhanh .do b{color:#ff6b7d}
+h3 .quet{margin-left:auto;font-size:10.5px;letter-spacing:0;text-transform:none;color:var(--mo);font-weight:500}
+.kenh.fb{background:#1877f2;color:#fff}.kenh.wa{background:#25d366;color:#05301a}.kenh.zalo{background:#0068ff;color:#fff}
+.tin-khach{background:rgba(255,255,255,.06);border-radius:10px;padding:8px 10px;font-size:13px;line-height:1.45;display:flex;flex-direction:column;gap:3px}
 .duyet .chi-ql{font-size:12px;color:var(--phu);margin-top:8px}
 .tb{display:flex;gap:9px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(140,190,255,.08);font-size:13px}
 .tb:last-child{border:0}
@@ -333,6 +349,7 @@ main{max-width:1680px;margin:0 auto;padding:12px 10px 40px;display:grid;gap:14px
 
   <section class="cot">
     <div class="khoi kinh"><h3>🔔 Thông báo & việc cần xử lý <span class="dem an" id="demXL"></span></h3><div id="dsThongBao"></div></div>
+    <div class="khoi kinh"><h3>💬 Tin khách chưa trả lời <span class="dem an" id="demTin"></span><span class="quet" id="tinQuet"></span></h3><div id="dsTin"><div class="chua-co">Đang tải…</div></div></div>
     <div class="phong-ct kinh" id="bangPhong"></div>
     <div class="khoi kinh"><h3>📅 Hôm nay</h3><div class="hom-nay" id="homNay"></div></div>
     <div class="khoi kinh"><h3>⚡ Hiệu suất AI hôm nay</h3><div id="hieuSuat"></div></div>
@@ -348,7 +365,7 @@ main{max-width:1680px;margin:0 auto;padding:12px 10px 40px;display:grid;gap:14px
 /* ===================== KẾT NỐI ===================== */
 // Chạy trên GitHub Pages: dán link Web App của Apps Script (kết thúc bằng /exec) vào giữa hai dấu nháy.
 // (Không bắt buộc: có thể dán link ngay trên màn hình đăng nhập, trang sẽ tự ghi nhớ.)
-const API_URL_CO_DINH = 'https://script.google.com/macros/s/AKfycbxw_LQcTfmeByNJMFH0biJ8I8pP7q_0ED_uruO73LDLZ6GBEW6U6Aj20uM4XTdWVOVR_w/exec';
+const API_URL_CO_DINH = '';
 const LA_GAS = typeof google !== 'undefined' && google.script && google.script.run;
 let API_URL = API_URL_CO_DINH;
 try { if (!API_URL) API_URL = localStorage.getItem('nh_api') || ''; } catch (e) {}
@@ -389,7 +406,14 @@ const XemThu = (() => {
     { ma:'CV-0002', tieuDe:'Kiểm tra lịch thay nhớt xe 51B-111.11', phuTrach:'Minh', han:dd(0), trangThai:'Đang làm' },
     { ma:'CV-0003', tieuDe:'Đăng bài Facebook tuyến Phan Rang – SG', phuTrach:'Linh', han:dd(2), trangThai:'Mới' }
   ];
-  const duyet = [], nhatKy = [];
+  const duyetBo = [
+    { ma:'YC-DEMO-FB', thoiGian:new Date(Date.now() - 6e5).toISOString(), nguoi:'AI', loai:'tra_loi_khach', moTa:'Trả lời Facebook – Emily Carter (MẪU)', trangThai:'Chờ duyệt',
+      duLieu:{ kenh:'fb', uid:'2678xxxx', ten:'Emily Carter (MẪU)', luc_khach:new Date(Date.now() - 6e5).toISOString(), hoi_thoai:['Hi, where do I get on the bus to Mui Ne tomorrow? My ticket says 229 Pham Ngu Lao.'],
+        noi_dung:'Hello Emily! Our pickup point has moved to our new office at 355 Phạm Ngũ Lão, Bến Thành (not 229). Please arrive 30 minutes before departure and show your e-ticket to our staff. Need help? WhatsApp +84 362 637 916. – Nam Hai Limousine' } },
+    { ma:'YC-DEMO-ZL', thoiGian:new Date(Date.now() - 2e5).toISOString(), nguoi:'AI', loai:'tra_loi_khach', moTa:'Trả lời Zalo OA – Chị Thảo (MẪU)', trangThai:'Chờ duyệt',
+      duLieu:{ kenh:'zalo', uid:'84xxxx', ten:'Chị Thảo (MẪU)', luc_khach:new Date(Date.now() - 2e5).toISOString(), hoi_thoai:['Cho chị hỏi mua 5 vé có giảm không em?'],
+        noi_dung:'Dạ chào chị Thảo! Nam Hải có chương trình thẻ thành viên: mua 5 vé được giảm 10%, mua 10 vé tặng 1 vé, tích theo số điện thoại của chị ạ. Chị cần đặt chuyến nào em hỗ trợ ngay nhé. Hotline/Zalo 0936 363 652.' } }
+  ], duyet = [], nhatKy = [];
   const LICH_XE = [[dd(0),'07:00','SG – Mũi Né','51B-111.11','Tường','Đoàn An'],[dd(0),'13:00','SG – Nha Trang','51B-222.22','Minh','Phúc'],[dd(0),'14:00','Mũi Né – SG','51B-333.33','Hải','Long'],[dd(1),'07:00','SG – Mũi Né','51B-333.33','Đoàn An','Tường']];
   const KT = [['Điểm đón Sài Gòn','355 Phạm Ngũ Lão, Q.1 (đã đổi từ 229 Phạm Ngũ Lão).'],['Thẻ thành viên','Mua 5 vé giảm 10%; mua 10 vé tặng 1 vé. Quản lý theo SĐT, tích điểm theo mã vé.'],['Thay nhớt','12.000 km thay; 10.000 km nhắc. SG–MN 200 km, SG–NT 400 km.'],['Liên hệ','WhatsApp +84 362 637 916 · Zalo/Hotline 0936 363 652 · namhaitravel.com · Zalo OA Nam Hải Limousine.'],['Tuyến xe','HCM – Mũi Né/Phan Thiết; HCM – Nha Trang; Phan Rang – Mũi Né – Phan Thiết; Phan Rang – HCM.']];
   const ch = s => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/gi,'d').toLowerCase();
@@ -465,6 +489,11 @@ const XemThu = (() => {
       if (phien.vaiTro !== 'Quản lý') throw new Error('Chỉ quản lý mới được duyệt.');
       const d = duyet.find(x => x.ma === ma); if (!d) throw new Error('Không thấy yêu cầu');
       if (!dongY) { d.trangThai = 'Từ chối'; ghi('Từ chối ' + d.moTa, 'can_duyet', 'OK', ''); return { ok:true, thongBao:'Đã từ chối.' }; }
+      if (d.loai === 'tra_loi_khach') {
+        await new Promise(r => setTimeout(r, 900));
+        d.trangThai = 'Đã thực hiện (mô phỏng)'; ghi('Gửi trả lời ' + d.moTa, 'can_duyet', 'OK', 'Bản xem thử');
+        return { ok:true, thongBao:'BẢN XEM THỬ: không gửi thật. Bản thật sẽ gửi qua ' + ({ fb:'Facebook Messenger', wa:'WhatsApp', zalo:'Zalo OA' })[d.duLieu.kenh] + ': "' + String(sua.noi_dung || '').slice(0, 60) + '…"' };
+      }
       if (d.loai === 'email_doi_diem_don') {
         const x = { ...d.duLieu, ...sua };
         if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x.email || '')) return { ok:false, thongBao:'KHÔNG gửi: thiếu hoặc sai email khách.' };
@@ -486,6 +515,7 @@ const MODULE_MAU = [
   { id:'booking', ten:'Booking OTA (12Go)', tt:'hoat_dong', mo_ta:'Tra booking 12Go trong Gmail: tên, ngày giờ, tuyến, email, đã huỷ chưa. Chỉ đọc.' },
   { id:'email', ten:'Email thông báo khách', tt:'hoat_dong', mo_ta:'Email đổi điểm đón 229 → 355 Phạm Ngũ Lão. Quản lý duyệt mới gửi, chống gửi trùng, gắn nhãn.' },
   { id:'cskh', ten:'Chăm sóc khách hàng', tt:'thu_nghiem', mo_ta:'AI soạn câu trả lời Việt/Anh theo sổ tay. Chưa nối Zalo OA/WhatsApp để gửi.' },
+  { id:'kenh_chat', ten:'Kênh chat khách', tt:'chua_ket_noi', mo_ta:'Facebook · Zalo OA · WhatsApp: AI soạn nháp trả lời, quản lý duyệt rồi mới gửi. Làm theo tài liệu hướng dẫn để nối.' },
   { id:'dieu_hanh', ten:'Công việc phòng điều hành', tt:'hoat_dong', mo_ta:'Giao việc bằng lời, theo dõi hạn, nhắc việc quá hạn mỗi sáng.' },
   { id:'so_lieu', ten:'Số liệu & doanh thu', tt:'thu_nghiem', mo_ta:'Đọc bảng khai báo trong NguonDuLieu. Chưa nối file Lãi lỗ / Doanh thu.' },
   { id:'marketing', ten:'Marketing FB · Zalo · TikTok', tt:'thu_nghiem', mo_ta:'AI soạn bài, caption, kịch bản video. Chưa có quyền API đăng bài.' },
@@ -1815,7 +1845,7 @@ function vePhong() {
     <h4>Đang xử lý</h4>${dang || '<div class="chua-co">Không có việc đang xử lý.</div>'}
     ${ds.length ? `<h4>Nhân sự</h4><div class="ns" id="dsNS">${nsHTML}</div>` : ''}
     ${(k.congCu || []).length ? `<h4>Công cụ</h4><div class="chips">${k.congCu.map(([t, u]) => `<a class="chip cong-cu" href="${esc(u)}" target="_blank" rel="noopener">🔗 ${esc(t)}</a>`).join('')}</div>` : ''}
-    ${k.kenh.length ? `<h4>Kết nối</h4><div class="kn">${k.kenh.map(([t, s]) => `<span><i style="background:${TT_KENH[s][0]}"></i>${esc(t)} · ${TT_KENH[s][1]}</span>`).join('')}</div>` : ''}
+    ${k.kenh.length ? `<h4>Kết nối</h4><div class="kn">${kenhThat(k).map(([t, s]) => `<span><i style="background:${TT_KENH[s][0]}"></i>${esc(t)} · ${TT_KENH[s][1]}</span>`).join('')}</div>` : ''}
     ${k.goiY.length ? `<h4>Giao việc nhanh</h4><div class="chips">${k.goiY.map(g => `<button class="chip" data-g="${esc(g)}">${esc(g)}</button>`).join('')}</div>` : ''}
     ${k.id === 'hop' ? `<button class="nut-chinh" id="nutHop" ${DoiSong.dangHop ? 'disabled' : ''}>🗓 Bắt đầu họp giao ban</button>` : ''}
     ${k.id === 'ql' ? `<button class="nut-chinh" id="nutXemDuyet">Xem ${soChoDuyet} việc chờ duyệt</button>` : ''}`;
@@ -1831,6 +1861,39 @@ setInterval(() => {
   ns.querySelectorAll('[data-nv]').forEach(d => { const [hd, lam] = hoatDongNV(VP.nv[d.dataset.nv]); const s = d.querySelector('.hd'); s.textContent = hd; s.classList.toggle('lam', lam); });
 }, 1000);
 
+/* ===================== TIN KHÁCH CHƯA TRẢ LỜI ===================== */
+const TIN_CHO_MAU = { n1:30, n2:60, quetCuoi:new Date(Date.now() - 12e4).toISOString(), ds:[
+  { kenh:'Facebook', ten:'Emily Carter (MẪU)', tin:'Hi, where do I get on the bus to Mui Ne tomorrow? My ticket says 229 Pham Ngu Lao.', phut:72, daNhac:2, link:'https://business.facebook.com/latest/inbox/all' },
+  { kenh:'Zalo OA', ten:'Chị Thảo (MẪU)', tin:'Cho chị hỏi mua 5 vé có giảm không em?', phut:41, daNhac:1, link:'https://oa.zalo.me/manage/' },
+  { kenh:'Zalo OA', ten:'Anh Minh (MẪU)', tin:'Xe Nha Trang tối nay còn ghế không?', phut:33, daNhac:1, link:'https://oa.zalo.me/manage/' }
+] };
+let tinCho = null, tinChoDaTai = false;
+// Trạng thái kết nối thật của phòng CSKH, lấy từ hệ thống theo dõi tin (TheoDoiTin.gs)
+function kenhThat(k) {
+  const kn = tinCho && tinCho.ketNoi;
+  if (!kn || k.id !== 'p2') return k.kenh;
+  const ds = k.kenh.map(([t, s]) => {
+    if (t === 'Messenger' || t === 'Facebook') return kn.fb ? ['Messenger · canh tin chưa trả lời', 'hoat_dong'] : [t, s];
+    if (t === 'Zalo OA') return kn.zalo ? ['Zalo OA · canh tin chưa trả lời', 'hoat_dong'] : [t, s];
+    return [t, s];
+  });
+  ds.push(kn.nhom ? ['Nhắc vào nhóm Zalo', 'hoat_dong'] : ['Nhắc qua email (chưa nối nhóm Zalo)', 'thu_nghiem']);
+  return ds;
+}
+async function taiTinCho() {
+  try { tinCho = LA_APPS_SCRIPT ? await goiServer('ai_tinChuaTraLoi', token) : TIN_CHO_MAU; }
+  catch (e) { tinCho = null; $('dsTin').innerHTML = '<div class="chua-co">Chưa bật theo dõi tin (thiếu file TheoDoiTin.gs hoặc chưa cho phép hàm ai_tinChuaTraLoi).</div>'; return; }
+  veTinCho();
+}
+function veTinCho() {
+  const tc = tinCho || { ds: [] }, n2 = tc.n2 || 60;
+  const thoiLuong = p => p >= 60 ? Math.floor(p / 60) + ' giờ ' + (p % 60) + ' phút' : p + ' phút';
+  $('demTin').textContent = tc.ds.length; $('demTin').classList.toggle('an', !tc.ds.length);
+  $('soTinCho') && ($('soTinCho').textContent = tc.ds.length);
+  $('tinQuet').textContent = tc.quetCuoi ? 'quét lúc ' + gio(tc.quetCuoi) : '';
+  $('dsTin').innerHTML = tc.ds.length ? tc.ds.map(x => `<div class="tin-cho ${x.phut >= n2 ? 'khan' : ''}"><div class="dong1"><span class="kenh ${x.kenh === 'Facebook' ? 'fb' : 'zalo'}">${esc(x.kenh)}</span><b>${esc(x.ten || 'Khách')}</b><span class="cho">${thoiLuong(x.phut)}</span></div><div class="noi">“${esc(x.tin)}”</div><div class="dong3"><span>${x.daNhac ? 'Đã nhắc nhóm ' + x.daNhac + ' lần' : 'Chưa nhắc (ngoài giờ)'}</span>${/^https?:\/\//.test(x.link || '') ? `<a href="${esc(x.link)}" target="_blank" rel="noopener">Mở hộp thư ↗</a>` : ''}</div></div>`).join('') : `<div class="chua-co">Không có tin nào chờ quá ${tc.n1 || 30} phút. 👍</div>`;
+}
+
 /* ===================== TỔNG QUAN ===================== */
 function veTongQuan() {
   if (!tq) return;
@@ -1838,7 +1901,8 @@ function veTongQuan() {
   const sl = tq.soLieu || {}, qh = tq.congViec.filter(v => v.hanSo && v.hanSo < homNaySo()).length;
   soChoDuyet = tq.choDuyet.length;
   VP.coSan && VP.soDuyet(soChoDuyet);
-  $('soNhanh').innerHTML = `<div><em>🚌</em><b>${esc(sl.chuyenHomNay ?? '–')}</b><span>Chuyến hôm nay</span></div><div><em>🎫</em><b>${esc(sl.booking12GoHomNay ?? '–')}</b><span>Email 12Go hôm nay</span></div><div class="hong"><em>✉️</em><b>${soChoDuyet}</b><span>Chờ duyệt</span></div><div class="vang"><em>⏱️</em><b>${qh}</b><span>Việc quá hạn</span></div>`;
+  $('soNhanh').innerHTML = `<div><em>🚌</em><b>${esc(sl.chuyenHomNay ?? '–')}</b><span>Chuyến hôm nay</span></div><div class="do"><em>💬</em><b id="soTinCho">${tinCho ? tinCho.ds.length : '–'}</b><span>Tin chưa trả lời</span></div><div class="hong"><em>✉️</em><b>${soChoDuyet}</b><span>Chờ duyệt</span></div><div class="vang"><em>⏱️</em><b>${qh}</b><span>Việc quá hạn</span></div>`;
+  if (!tinChoDaTai) { tinChoDaTai = true; taiTinCho(); setInterval(taiTinCho, 60000); }
   demMenu('ql', soChoDuyet); demMenu('p3', Number(sl.booking12GoHomNay) || 0); demMenu('gd', qh);
   veHomNay(sl); veHieuSuat();
 
@@ -1846,18 +1910,22 @@ function veTongQuan() {
   $('dsDuyet').innerHTML = soChoDuyet ? '' : '<div class="chua-co">Không có yêu cầu nào chờ duyệt.</div>';
   tq.choDuyet.forEach(d => {
     const el = document.createElement('div'); el.className = 'duyet';
-    const x = d.duLieu || {}, laEmail = d.loai === 'email_doi_diem_don';
+    const x = d.duLieu || {}, laEmail = d.loai === 'email_doi_diem_don', laChat = d.loai === 'tra_loi_khach';
+    const TEN_KENH = { fb:'Facebook', wa:'WhatsApp', zalo:'Zalo OA' };
     el.innerHTML = `<div class="tde">${esc(d.moTa)}</div><div class="meta">${esc(d.ma)} · ${esc(d.nguoi)} đề xuất · ${gio(d.thoiGian)}</div>` +
-      (laEmail ? `${(x.canh_bao || []).length ? `<div class="cb">⚠ ${esc(x.canh_bao.join(' · '))} – điền trước khi duyệt</div>` : ''}
+      (laChat ? `<div class="kenh-chat"><span class="kenh ${esc(x.kenh)}">${esc(TEN_KENH[x.kenh] || x.kenh)}</span> ${esc(x.ten || 'Khách')} · nhắn ${gio(x.luc_khach)}</div>
+        <div class="tin-khach">${(x.hoi_thoai || [x.tin_khach]).map(t => `<div>${esc(t)}</div>`).join('')}</div>
+        <label>Trả lời (AI soạn nháp – sửa được)</label><textarea data-k="noi_dung" rows="4">${esc(x.noi_dung || '')}</textarea>`
+      : laEmail ? `${(x.canh_bao || []).length ? `<div class="cb">⚠ ${esc(x.canh_bao.join(' · '))} – điền trước khi duyệt</div>` : ''}
         <label>Email khách</label><input data-k="email" value="${esc(x.email || '')}" placeholder="khach@email.com">
         <div class="hang"><div><label>Ngày đi</label><input data-k="ngay" type="date" value="${esc(x.ngay || '')}"></div><div><label>Giờ đi</label><input data-k="gio" type="time" value="${esc(x.gio || '')}"></div></div>
         <label>Tên khách</label><input data-k="ten" value="${esc(x.ten || '')}">
         <div class="meta" style="margin-top:6px">${esc(x.tuyen || '')}${x.sdt ? ' · ' + esc(x.sdt) : ''}</div>` : `<div class="meta">Loại: ${esc(d.loai)} · Duyệt = giao nhân viên làm thủ công (chưa tự động).</div>`) +
-      (nd.laQuanLy ? `<div class="nut"><button class="n-tu-choi">Từ chối</button><button class="n-duyet">${laEmail ? 'Duyệt & gửi email' : 'Duyệt'}</button></div>` : '<div class="chi-ql">Chờ quản lý duyệt.</div>');
+      (nd.laQuanLy ? `<div class="nut"><button class="n-tu-choi">${laChat ? 'Bỏ qua' : 'Từ chối'}</button><button class="n-duyet">${laEmail ? 'Duyệt & gửi email' : laChat ? 'Gửi cho khách' : 'Duyệt'}</button></div>` : '<div class="chi-ql">Chờ quản lý duyệt.</div>');
     if (nd.laQuanLy) {
       const [tc, dy] = el.querySelectorAll('button');
       tc.onclick = () => duyet(d, false, {}, el);
-      dy.onclick = () => { const sua = {}; el.querySelectorAll('input[data-k]').forEach(i => sua[i.dataset.k] = i.value.trim()); duyet(d, true, sua, el); };
+      dy.onclick = () => { const sua = {}; el.querySelectorAll('input[data-k],textarea[data-k]').forEach(i => sua[i.dataset.k] = i.value.trim()); duyet(d, true, sua, el); };
     }
     $('dsDuyet').appendChild(el);
   });
