@@ -27,6 +27,7 @@ UP = {'/openapi/': 'openapi.zalo.me', '/oauth/': 'oauth.zaloapp.com'}
 BO = {'host', 'connection', 'content-length', 'accept-encoding', 'x-forwarded-for', 'x-forwarded-host',
       'x-forwarded-proto', 'via', 'transfer-encoding', 'x-namhai-key', 'keep-alive'}
 GIU = {'access_token', 'secret_key', 'content-type'}
+DOI = {'x-zalo-access-token': 'access_token', 'x-zalo-secret-key': 'secret_key'}
 TEST = os.environ.get('NH_TEST')  # chi dung khi kiem thu
 
 class H(http.server.BaseHTTPRequestHandler):
@@ -50,8 +51,10 @@ class H(http.server.BaseHTTPRequestHandler):
             c.putrequest(self.command, '/' + self.path[len(goc):], skip_host=True, skip_accept_encoding=True)
             c.putheader('host', UP[goc])
             # Chi chuyen dung cac khoa Zalo can, bo het header cua Google (tranh Zalo tra trang loi)
+            # Google bo mat header co dau gach duoi (access_token, secret_key) -> Apps Script gui ten X-Zalo-..., doi lai o day
             for k, v in self.headers.items():
-                if k.lower() in GIU: c.putheader(k.lower(), v)
+                ten = DOI.get(k.lower(), k.lower())
+                if ten in GIU: c.putheader(ten, v)
             c.putheader('user-agent', 'NamHaiAI/1.0')
             c.putheader('accept', 'application/json')
             if body is not None: c.putheader('content-length', str(len(body)))
@@ -106,7 +109,7 @@ echo " Quoc gia cua may chu: $QG  (phai la VN)"
 echo " LINK     : https://$TEN"
 echo " MAT KHAU : $KEY"
 echo " Bo chuyen tiep: $(systemctl is-active namhai-zalo.service)  (phai la active)"
-echo " Phien ban: 4"
+echo " Phien ban: 6"
 echo "=================================================="
 echo "Kiem tra nhanh (phai hien chu: cam):"
 curl -s --max-time 30 "https://$TEN/openapi/" || echo "(chua co chung chi HTTPS, doi 1-2 phut roi thu lai)"
